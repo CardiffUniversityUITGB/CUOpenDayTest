@@ -7,7 +7,7 @@ This exercise is a quick coding challenge designed to give us an idea of how you
 
 * This is an open exercise to be completed and submitted **48 hours** before your interview. 
 * Once completed, please upload the project to a GitHub repository and email us a public link to the repository and GitHub pages site, with the subject “*Interview Exercise '**Your name**'*”. 
-* We advise that you spend no more than 60 minutes on this exercise.
+* We don’t specify how much time people spend on this task, but on average, they spend between one and two hours.
 
 Using the [CUOpenDayTest](https://github.com/CardiffUniversityUITGB/CUOpenDayTest) repository as a starting point, you should complete the following assignment. In addition to modifying the existing repository, you should also document the requirements that you would have produced to support the project.
 
