@@ -14,11 +14,17 @@ async function loadOpenDay() {
 }
 
 function renderOpenDay(data: any) {
+  
   const app = document.querySelector<HTMLDivElement>('#app')!
   if (!data.topics) {
     app.innerHTML = '<p class="text-red-600">No Open Day data found.</p>'
     return
   }
+  const selected = (document.getElementById('topicFilter') as HTMLSelectElement)?.value
+
+  const filteredTopics = selected && selected !== "all"
+    ? data.topics.filter((t: any) => t.name === selected)
+    : data.topics
   app.innerHTML = `
     <div class="demo-banner w-full bg-yellow-300 text-black flex flex-col sm:flex-row items-center justify-between px-4 py-2 mb-6 gap-2 border-b-2 border-yellow-500">
       <div class="font-bold text-lg flex-1 text-center sm:text-left">This is a demo app</div>
@@ -34,24 +40,61 @@ function renderOpenDay(data: any) {
         </a>
       </div>
     </div>
-    <div class="min-h-screen bg-cardiff-white font-sans px-2 py-6">
+    <div class="min-h-screen bg-gray-50 font-sans px-4 py-8">
       <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
         <a href="https://www.cardiff.ac.uk/" target="_blank" rel="noopener noreferrer">
           <img src="${cuLogo}" alt="Cardiff University Logo" class="h-16 w-auto" />
         </a>
       </div>
       <h1 class="text-3xl sm:text-5xl font-bold text-cardiff-red mb-8 text-center">Cardiff University Open Day</h1>
-      <div class="grid gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-        ${data.topics.map((topic: any) => topic && topic.name ? `
-          <div class="bg-cardiff-grey rounded-lg shadow p-6 flex flex-col">
-            <img src="${topic.cover_image || cuLogo}" alt="${topic.name}" class="h-32 w-full object-cover rounded mb-4" />
-            <h2 class="text-xl font-bold text-cardiff-red mb-2">${topic.name}</h2>
+      <div class="mb-8 text-center">
+      <select
+          id="topicFilter"
+          class="p-3 border border-gray-300 rounded-lg shadow-sm bg-white text-gray-800 focus:ring-2 focus:ring-cardiff-red focus:border-cardiff-red transition"
+        >
+        <option value="all">All Subjects</option>
+        ${data.topics.map((t: any) => `
+          <option value="${t.name}" ${selected === t.name ? 'selected' : ''}>
+            ${t.name}
+          </option>
+        `).join('')}
+      </select>
+    </div>
+      <div class="grid gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 items-start">
+        ${filteredTopics.map((topic: any) => topic && topic.name ? `
+          <div 
+            class="bg-white rounded-xl shadow-md hover:shadow-xl hover:scale-[1.02] transition p-6 flex flex-col cursor-pointer"
+            onclick="toggleEvents(${topic.id})"
+            tabindex="0"
+            onkeydown="if(event.key === 'Enter') toggleEvents(${topic.id})"
+          >
+            <img src="${topic.cover_image ?? cuLogo}" class="h-40 w-full object-cover rounded-lg mb-4 bg-gray-200" />
+            <h2 class="text-xl font-semibold text-gray-900 mb-2">${topic.name}</h2>
             <p class="text-cardiff-dark mb-2">${topic.description || ''}</p>
             ${topic.programs && topic.programs.length ? `
-              <div class="mt-2">
+              <div class="mt-2 hidden" id="events-${topic.id}">
                 <h3 class="font-semibold text-cardiff-dark mb-1">Events:</h3>
                 <ul class="list-disc list-inside text-sm">
-                  ${topic.programs.map((prog: any) => prog && prog.title ? `<li><span class="font-semibold">${prog.title}</span>${prog.start_time ? ` <span class='text-xs text-cardiff-dark'>(${new Date(prog.start_time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}${prog.end_time ? ' - ' + new Date(prog.end_time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : ''})</span>` : ''}${prog.room ? `, <span class='text-xs'>${prog.room}</span>` : ''}</li>` : '').join('')}
+                  ${[...topic.programs]
+  .sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime())
+  .map((prog: any) => prog && prog.title ? `
+    <li class="mb-3">
+      <div class="font-semibold text-cardiff-dark">${prog.title}</div>
+      <div class="text-sm text-gray-600">
+        ${
+          prog.start_time
+            ? new Date(prog.start_time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+            : ''
+        }
+        ${
+          prog.end_time
+            ? ` - ${new Date(prog.end_time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`
+            : ''
+        }
+        ${prog.room ? ` • ${prog.room}` : ''}
+      </div>
+    </li>
+  ` : '').join('')}
                 </ul>
               </div>
             ` : ''}
@@ -60,6 +103,25 @@ function renderOpenDay(data: any) {
       </div>
     </div>
   `
+  document.getElementById('topicFilter')?.addEventListener('change', () => {
+  renderOpenDay(data)
+})
+
 }
 
-loadOpenDay().then(renderOpenDay)
+loadOpenDay().then(renderOpenDay);
+
+(window as any).toggleEvents = (id: number) => {
+  // Close all other open sections
+  document.querySelectorAll('[id^="events-"]').forEach((el) => {
+    if (el.id !== `events-${id}`) {
+      el.classList.add('hidden')
+    }
+  })
+
+  // Toggle the clicked one
+  const el = document.getElementById(`events-${id}`)
+  if (el) {
+    el.classList.toggle('hidden')
+  }
+}
