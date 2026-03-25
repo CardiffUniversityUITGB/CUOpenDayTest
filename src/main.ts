@@ -26,6 +26,13 @@ function renderOpenDay(data: any) {
     ? data.topics.filter((t: any) => t.name === selected)
     : data.topics
   app.innerHTML = `
+  <a 
+    href="#main-content" 
+    class="absolute left-0 top-0 m-2 p-2 bg-white text-cardiff-red border border-cardiff-red rounded shadow focus:translate-y-0 -translate-y-20 focus:outline-none transition"
+  >
+    Skip to main content
+  </a>
+
     <div class="demo-banner w-full bg-yellow-300 text-black flex flex-col sm:flex-row items-center justify-between px-4 py-2 mb-6 gap-2 border-b-2 border-yellow-500">
       <div class="font-bold text-lg flex-1 text-center sm:text-left">This is a demo app</div>
       <div class="flex flex-row items-center gap-3 justify-center">
@@ -40,35 +47,46 @@ function renderOpenDay(data: any) {
         </a>
       </div>
     </div>
-    <div class="min-h-screen bg-gray-50 font-sans px-4 py-8">
+    <main class="min-h-screen bg-gray-50 font-sans px-4 py-8">
       <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
         <a href="https://www.cardiff.ac.uk/" target="_blank" rel="noopener noreferrer">
           <img src="${cuLogo}" alt="Cardiff University Logo" class="h-16 w-auto" />
         </a>
       </div>
       <h1 class="text-3xl sm:text-5xl font-bold text-cardiff-red mb-8 text-center">Cardiff University Open Day</h1>
-      <div class="mb-8 text-center">
-      <select
-          id="topicFilter"
-          class="p-3 border border-gray-300 rounded-lg shadow-sm bg-white text-gray-800 focus:ring-2 focus:ring-cardiff-red focus:border-cardiff-red transition"
-        >
-        <option value="all">All Subjects</option>
-        ${data.topics.map((t: any) => `
-          <option value="${t.name}" ${selected === t.name ? 'selected' : ''}>
-            ${t.name}
-          </option>
-        `).join('')}
-      </select>
-    </div>
+      <div class="sticky top-0 z-10 bg-gray-50 py-4 mb-6 shadow-sm">
+        <div class="text-center">
+          <select
+            id="topicFilter"
+            class="p-3 border border-gray-300 rounded-lg shadow-md bg-white text-gray-800 focus:ring-2 focus:ring-cardiff-red focus:border-cardiff-red transition"
+          >
+            <option value="all">All Subjects</option>
+            ${data.topics.map((t: any) => `
+              <option value="${t.name}" ${selected === t.name ? 'selected' : ''}>
+                ${t.name}
+              </option>
+            `).join('')}
+          </select>
+        </div>
+      </div>
+
       <div class="grid gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 items-start">
         ${filteredTopics.map((topic: any) => topic && topic.name ? `
           <div 
-            class="bg-white rounded-xl shadow-md hover:shadow-xl hover:scale-[1.02] transition p-6 flex flex-col cursor-pointer"
-            onclick="toggleEvents(${topic.id})"
-            tabindex="0"
-            onkeydown="if(event.key === 'Enter') toggleEvents(${topic.id})"
-          >
-            <img src="${topic.cover_image ?? cuLogo}" class="h-40 w-full object-cover rounded-lg mb-4 bg-gray-200" />
+              class="bg-white rounded-xl shadow-md hover:shadow-xl hover:scale-[1.02] transition p-6 flex flex-col cursor-pointer"
+              onclick="toggleEvents(${topic.id})"
+              tabindex="0"
+              role="button"
+              aria-expanded="false"
+              aria-controls="events-${topic.id}"
+              onkeydown="if(event.key === 'Enter') toggleEvents(${topic.id})"
+            >
+            <img 
+              src="${topic.cover_image ?? cuLogo}" 
+              alt="${topic.name} cover image" 
+              class="h-40 w-full object-cover rounded-lg mb-4 bg-gray-200" 
+            />
+
             <h2 class="text-xl font-semibold text-gray-900 mb-2">${topic.name}</h2>
             <p class="text-cardiff-dark mb-2">${topic.description || ''}</p>
             ${topic.programs && topic.programs.length ? `
