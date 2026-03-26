@@ -27,11 +27,12 @@ function renderOpenDay(data: any) {
     : data.topics
   app.innerHTML = `
   <a 
-    href="#main-content" 
+    href="#page-title" 
     class="absolute left-0 top-0 m-2 p-2 bg-white text-cardiff-red border border-cardiff-red rounded shadow focus:translate-y-0 -translate-y-20 focus:outline-none transition"
   >
     Skip to main content
   </a>
+
 
     <div class="demo-banner w-full bg-yellow-300 text-black flex flex-col sm:flex-row items-center justify-between px-4 py-2 mb-6 gap-2 border-b-2 border-yellow-500">
       <div class="font-bold text-lg flex-1 text-center sm:text-left">This is a demo app</div>
@@ -53,7 +54,17 @@ function renderOpenDay(data: any) {
           <img src="${cuLogo}" alt="Cardiff University Logo" class="h-16 w-auto" />
         </a>
       </div>
-      <h1 class="text-3xl sm:text-5xl font-bold text-cardiff-red mb-8 text-center">Cardiff University Open Day</h1>
+      <div class="w-full bg-cardiff-red py-10">
+        <div class="container mx-auto px-4">
+          <h1 
+            id="page-title"
+            class="text-white text-3xl sm:text-5xl font-bold"
+          >
+            Cardiff University Open Day
+          </h1>
+        </div>
+      </div>
+
       <div class="sticky top-0 z-10 bg-gray-50 py-4 mb-6 shadow-sm">
         <div class="text-center">
           <select
